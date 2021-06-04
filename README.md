@@ -2,7 +2,7 @@
 [![CI](https://github.com/go-semantic-release/semantic-release/workflows/CI/badge.svg?branch=master)](https://github.com/go-semantic-release/semantic-release/actions?query=workflow%3ACI+branch%3Amaster)
 [![pipeline status](https://gitlab.com/go-semantic-release/semantic-release/badges/master/pipeline.svg)](https://gitlab.com/go-semantic-release/semantic-release/pipelines)
 [![Go Report Card](https://goreportcard.com/badge/github.com/go-semantic-release/semantic-release)](https://goreportcard.com/report/github.com/go-semantic-release/semantic-release)
-[![PkgGoDev](https://pkg.go.dev/badge/github.com/go-semantic-release/semantic-release/v2)](https://pkg.go.dev/github.com/go-semantic-release/semantic-release/v2)
+[![PkgGoDev](https://pkg.go.dev/badge/github.com/duanqy/semantic-release)](https://pkg.go.dev/github.com/duanqy/semantic-release)
 
 > fully automated package/module/image publishing
 
@@ -60,12 +60,12 @@ Since v2, semantic-release is equipped with a plugin system. The plugins are sta
 
 ### Plugin Types
 
-* Commit Analyzer ([Docs](https://pkg.go.dev/github.com/go-semantic-release/semantic-release/v2/pkg/analyzer?tab=doc#CommitAnalyzer), [Example](https://github.com/go-semantic-release/commit-analyzer-cz))
-* CI Condition ([Docs](https://pkg.go.dev/github.com/go-semantic-release/semantic-release/v2/pkg/condition?tab=doc#CICondition), [Example](https://github.com/go-semantic-release/condition-github))
-* Changelog Generator ([Docs](https://pkg.go.dev/github.com/go-semantic-release/semantic-release/v2/pkg/generator?tab=doc#ChangelogGenerator), [Example](https://github.com/go-semantic-release/changelog-generator-default))
-* Provider ([Docs](https://pkg.go.dev/github.com/go-semantic-release/semantic-release/v2/pkg/provider?tab=doc#Provider), [Example](https://github.com/go-semantic-release/provider-github))
-* Files Updater ([Docs](https://pkg.go.dev/github.com/go-semantic-release/semantic-release/v2/pkg/updater?tab=doc#FilesUpdater), [Example](https://github.com/go-semantic-release/files-updater-npm))
-* Hooks ([Docs](https://pkg.go.dev/github.com/go-semantic-release/semantic-release/v2/pkg/hooks?tab=doc#Hooks))
+* Commit Analyzer ([Docs](https://pkg.go.dev/github.com/duanqy/semantic-release/pkg/analyzer?tab=doc#CommitAnalyzer), [Example](https://github.com/go-semantic-release/commit-analyzer-cz))
+* CI Condition ([Docs](https://pkg.go.dev/github.com/duanqy/semantic-release/pkg/condition?tab=doc#CICondition), [Example](https://github.com/go-semantic-release/condition-github))
+* Changelog Generator ([Docs](https://pkg.go.dev/github.com/duanqy/semantic-release/pkg/generator?tab=doc#ChangelogGenerator), [Example](https://github.com/go-semantic-release/changelog-generator-default))
+* Provider ([Docs](https://pkg.go.dev/github.com/duanqy/semantic-release/pkg/provider?tab=doc#Provider), [Example](https://github.com/go-semantic-release/provider-github))
+* Files Updater ([Docs](https://pkg.go.dev/github.com/duanqy/semantic-release/pkg/updater?tab=doc#FilesUpdater), [Example](https://github.com/go-semantic-release/files-updater-npm))
+* Hooks ([Docs](https://pkg.go.dev/github.com/duanqy/semantic-release/pkg/hooks?tab=doc#Hooks))
 
 ### Configuration
 

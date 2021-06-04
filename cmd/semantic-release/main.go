@@ -11,13 +11,20 @@ import (
 	"syscall"
 
 	"github.com/Masterminds/semver/v3"
-	"github.com/go-semantic-release/semantic-release/v2/pkg/config"
-	"github.com/go-semantic-release/semantic-release/v2/pkg/generator"
-	"github.com/go-semantic-release/semantic-release/v2/pkg/hooks"
-	"github.com/go-semantic-release/semantic-release/v2/pkg/plugin/manager"
-	"github.com/go-semantic-release/semantic-release/v2/pkg/provider"
-	"github.com/go-semantic-release/semantic-release/v2/pkg/semrel"
+	"github.com/duanqy/semantic-release/pkg/config"
+	"github.com/duanqy/semantic-release/pkg/plugin"
+	"github.com/duanqy/semantic-release/pkg/semrel"
 	"github.com/spf13/cobra"
+
+	_ "github.com/duanqy/semantic-release/plugin/changelog_generator"
+	_ "github.com/duanqy/semantic-release/plugin/commit_analyzer"
+	_ "github.com/duanqy/semantic-release/plugin/condition/default_condition"
+	_ "github.com/duanqy/semantic-release/plugin/condition/github_condition"
+	_ "github.com/duanqy/semantic-release/plugin/condition/gitlab_condition"
+	_ "github.com/duanqy/semantic-release/plugin/files_updater_npm"
+	_ "github.com/duanqy/semantic-release/plugin/provider/githubprovider"
+	_ "github.com/duanqy/semantic-release/plugin/provider/gitlabprovider"
+	_ "github.com/duanqy/semantic-release/plugin/provider/gitprovider"
 )
 
 // SRVERSION is the semantic-release version (added at compile time)
@@ -71,7 +78,7 @@ func cliHandler(cmd *cobra.Command, args []string) {
 	conf, err := config.NewConfig(cmd)
 	exitIfError(err)
 
-	pluginManager, err := manager.New(conf)
+	pluginManager, err := plugin.NewManager(conf)
 	exitIfError(err)
 	exitHandler = func() {
 		pluginManager.Stop()
@@ -83,12 +90,6 @@ func cliHandler(cmd *cobra.Command, args []string) {
 		<-c
 		exitIfError(errors.New("terminating..."))
 	}()
-
-	if conf.DownloadPlugins {
-		exitIfError(pluginManager.FetchAllPlugins())
-		logger.Println("all plugins are downloaded")
-		os.Exit(0)
-	}
 
 	ci, err := pluginManager.GetCICondition()
 	exitIfError(err)
@@ -152,10 +153,7 @@ func cliHandler(cmd *cobra.Command, args []string) {
 		}
 		err = ci.RunCondition(conditionConfig)
 		if err != nil {
-			herr := hooksExecutor.NoRelease(&hooks.NoReleaseConfig{
-				Reason:  hooks.NoReleaseReason_CONDITION,
-				Message: err.Error(),
-			})
+			herr := hooksExecutor.NoRelease(plugin.NoReleaseReasonCondition, err.Error())
 			if herr != nil {
 				logger.Printf("there was an error executing the hooks plugins: %s", herr.Error())
 			}
@@ -196,10 +194,7 @@ func cliHandler(cmd *cobra.Command, args []string) {
 	logger.Println("calculating new version...")
 	newVer := semrel.GetNewVersion(conf, commits, release)
 	if newVer == "" {
-		herr := hooksExecutor.NoRelease(&hooks.NoReleaseConfig{
-			Reason:  hooks.NoReleaseReason_NO_CHANGE,
-			Message: "",
-		})
+		herr := hooksExecutor.NoRelease(plugin.NoReleaseReasonNoChange, "")
 		if herr != nil {
 			logger.Printf("there was an error executing the hooks plugins: %s", herr.Error())
 		}
@@ -218,11 +213,7 @@ func cliHandler(cmd *cobra.Command, args []string) {
 	logger.Printf("changelog-generator plugin: %s@%s\n", changelogGenerator.Name(), changelogGenerator.Version())
 	exitIfError(changelogGenerator.Init(conf.ChangelogGeneratorOpts))
 
-	changelogRes := changelogGenerator.Generate(&generator.ChangelogGeneratorConfig{
-		Commits:       commits,
-		LatestRelease: release,
-		NewVersion:    newVer,
-	})
+	changelogRes := changelogGenerator.Generate(commits, release, newVer)
 	if conf.Changelog != "" {
 		oldFile := make([]byte, 0)
 		if conf.PrependChangelog {
@@ -243,7 +234,7 @@ func cliHandler(cmd *cobra.Command, args []string) {
 	}
 
 	logger.Println("creating release...")
-	newRelease := &provider.CreateReleaseConfig{
+	newRelease := &plugin.CreateReleaseConfig{
 		Changelog:  changelogRes,
 		NewVersion: newVer,
 		Prerelease: conf.Prerelease,
@@ -272,16 +263,10 @@ func cliHandler(cmd *cobra.Command, args []string) {
 		}
 	}
 
-	herr := hooksExecutor.Success(&hooks.SuccessHookConfig{
-		Commits:     commits,
-		PrevRelease: release,
-		NewRelease: &semrel.Release{
-			SHA:     currentSha,
-			Version: newVer,
-		},
-		Changelog: changelogRes,
-		RepoInfo:  repoInfo,
-	})
+	herr := hooksExecutor.Success(commits, release, &semrel.Release{
+		SHA:     currentSha,
+		Version: newVer,
+	}, changelogRes, repoInfo)
 
 	if herr != nil {
 		logger.Printf("there was an error executing the hooks plugins: %s", herr.Error())

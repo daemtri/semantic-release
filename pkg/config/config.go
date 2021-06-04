@@ -36,8 +36,6 @@ type Config struct {
 	ForceBumpPatchVersion           bool
 	MaintainedVersion               string
 	PrependChangelog                bool
-	DownloadPlugins                 bool
-	ShowProgress                    bool
 }
 
 func mustGetString(cmd *cobra.Command, name string) string {
@@ -126,8 +124,6 @@ func NewConfig(cmd *cobra.Command) (*Config, error) {
 		ForceBumpPatchVersion:           mustGetBool(cmd, "force-bump-patch-version"),
 		MaintainedVersion:               viper.GetString("maintainedVersion"),
 		PrependChangelog:                mustGetBool(cmd, "prepend-changelog"),
-		DownloadPlugins:                 mustGetBool(cmd, "download-plugins"),
-		ShowProgress:                    mustGetBool(cmd, "show-progress"),
 	}
 	return conf, nil
 }
@@ -181,8 +177,6 @@ func InitConfig(cmd *cobra.Command) error {
 	cmd.Flags().Bool("allow-no-changes", false, "exit with code 0 if no changes are found, useful if semantic-release is automatically run")
 	cmd.Flags().Bool("force-bump-patch-version", false, "increments the patch version if no changes are found")
 	cmd.Flags().Bool("prepend-changelog", false, "if the changelog file already exist the new changelog is prepended")
-	cmd.Flags().Bool("download-plugins", false, "downloads all required plugins if needed")
-	cmd.Flags().Bool("show-progress", false, "shows the plugin download progress")
 	cmd.Flags().SortFlags = true
 
 	viper.AddConfigPath(".")

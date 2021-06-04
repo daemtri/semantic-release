@@ -1,6 +1,7 @@
 package semrel
 
 import (
+	"errors"
 	"sort"
 	"strings"
 
@@ -41,6 +42,10 @@ func (r releases) GetLatestRelease(vrange string) (*Release, error) {
 			return lastRelease, nil
 		}
 		return &Release{SHA: "", Version: "0.0.0"}, nil
+	}
+
+	if lastRelease == nil {
+		return nil, errors.New("GetLatestRelease: lastRelease为nil")
 	}
 
 	constraint, err := semver.NewConstraint(vrange)
