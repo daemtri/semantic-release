@@ -28,7 +28,7 @@ import (
 )
 
 // SRVERSION is the semantic-release version (added at compile time)
-var SRVERSION string
+var SRVERSION string = "dqy"
 
 var exitHandler func()
 
