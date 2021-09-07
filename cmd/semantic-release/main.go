@@ -179,13 +179,14 @@ func cliHandler(cmd *cobra.Command, args []string) {
 		exitIfError(fmt.Errorf("no pre-release for this version possible"))
 	}
 
-	logger.Println("getting commits...")
-	rawCommits, err := prov.GetCommits(release.SHA, currentSha)
-	exitIfError(err)
-	if len(rawCommits) == 0 {
+	if release.SHA == currentSha {
 		logger.Println("no new commits,write last release version")
 		exitIfError(ioutil.WriteFile(".version", []byte(release.Version), 0644))
 	}
+
+	logger.Println("getting commits...")
+	rawCommits, err := prov.GetCommits(release.SHA, currentSha)
+	exitIfError(err)
 
 	logger.Println("analyzing commits...")
 	commitAnalyzer, err := pluginManager.GetCommitAnalyzer()
