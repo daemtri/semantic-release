@@ -182,6 +182,10 @@ func cliHandler(cmd *cobra.Command, args []string) {
 	logger.Println("getting commits...")
 	rawCommits, err := prov.GetCommits(release.SHA, currentSha)
 	exitIfError(err)
+	if len(rawCommits) == 0 {
+		logger.Println("no new commits,write last release version")
+		exitIfError(ioutil.WriteFile(".version", []byte(release.Version), 0644))
+	}
 
 	logger.Println("analyzing commits...")
 	commitAnalyzer, err := pluginManager.GetCommitAnalyzer()
@@ -199,11 +203,13 @@ func cliHandler(cmd *cobra.Command, args []string) {
 			logger.Printf("there was an error executing the hooks plugins: %s", herr.Error())
 		}
 		errNoChange := errors.New("no change")
-		if conf.AllowNoChanges {
-			exitIfError(errNoChange, 0)
-		} else {
+		if !conf.AllowNoChanges {
 			exitIfError(errNoChange, 65)
 		}
+		// exitIfError(errNoChange, 0)
+		logger.Println("can not calculate new version, inc patch version")
+		ver := semver.MustParse(release.Version)
+		newVer = ver.IncPatch().String()
 	}
 	logger.Println("new version: " + newVer)
 
