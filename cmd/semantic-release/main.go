@@ -182,6 +182,7 @@ func cliHandler(cmd *cobra.Command, args []string) {
 	if release.SHA == currentSha {
 		logger.Println("no new commits,write last release version")
 		exitIfError(ioutil.WriteFile(".version", []byte(release.Version), 0644))
+		return
 	}
 
 	logger.Println("getting commits...")
