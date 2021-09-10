@@ -4,6 +4,7 @@ go 1.16
 
 require (
 	github.com/Masterminds/semver/v3 v3.1.0
+	github.com/davecgh/go-spew v1.1.1
 	github.com/go-git/go-git-fixtures/v4 v4.2.2 // indirect
 	github.com/go-git/go-git/v5 v5.2.0
 	github.com/golang/protobuf v1.5.2 // indirect

@@ -2,6 +2,7 @@ package default_condition
 
 import (
 	"io/ioutil"
+	"path/filepath"
 	"strings"
 
 	"github.com/duanqy/semantic-release/pkg/plugin"
@@ -17,6 +18,23 @@ func ReadGitHead() string {
 		return ""
 	}
 	return strings.TrimSpace(strings.TrimPrefix(string(data), "ref: refs/heads/"))
+}
+
+func ReadGitSHA() string {
+	data, err := ioutil.ReadFile(".git/HEAD")
+	if err != nil {
+		return ""
+	}
+	dataStr := string(data)
+	if !strings.HasPrefix(dataStr, "ref:") {
+		return dataStr
+	}
+	ref := strings.TrimSpace(strings.TrimPrefix(dataStr, "ref:"))
+	shaData, err := ioutil.ReadFile(filepath.Join(".git", ref))
+	if err != nil {
+		return ""
+	}
+	return strings.TrimSpace(string(shaData))
 }
 
 var CIVERSION = "dev"
@@ -41,5 +59,5 @@ func (d *DefaultCI) GetCurrentBranch() string {
 }
 
 func (d *DefaultCI) GetCurrentSHA() string {
-	return ReadGitHead()
+	return ReadGitSHA()
 }

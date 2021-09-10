@@ -64,20 +64,16 @@ func (repo *Repository) Init(config map[string]string) error {
 	} else if config["auth"] == "ssh" {
 		auth, err := ssh.NewPublicKeysFromFile(config["auth_username"], config["auth_private_key"], config["auth_password"])
 		if err != nil {
-			return err
+			return fmt.Errorf("ssh.NewPublicKeysFromFile: %w", err)
 		}
 		repo.auth = auth
 	} else {
 		repo.auth = nil
 	}
 
-	gitPath := config["git_path"]
-	if gitPath == "" {
-		gitPath = "."
-	}
-	gr, err := git.PlainOpen(gitPath)
+	gr, err := git.PlainOpen(".")
 	if err != nil {
-		return err
+		return fmt.Errorf("git.PlainOpen: %w", err)
 	}
 	repo.repo = gr
 
@@ -178,7 +174,7 @@ func (repo *Repository) CreateRelease(release *plugin.CreateReleaseConfig) error
 		},
 	})
 	if err != nil {
-		return err
+		return fmt.Errorf("git.CreateTag: %w", err)
 	}
 	err = repo.repo.Push(&git.PushOptions{
 		RemoteName: repo.remoteName,
@@ -187,7 +183,7 @@ func (repo *Repository) CreateRelease(release *plugin.CreateReleaseConfig) error
 		},
 		Auth: repo.auth,
 	})
-	return err
+	return fmt.Errorf("repo.Push tag: %w", err)
 }
 
 func (repo *Repository) Name() string {

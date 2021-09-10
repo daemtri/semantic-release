@@ -205,13 +205,11 @@ func cliHandler(cmd *cobra.Command, args []string) {
 			logger.Printf("there was an error executing the hooks plugins: %s", herr.Error())
 		}
 		errNoChange := errors.New("no change")
-		if !conf.AllowNoChanges {
+		if conf.AllowNoChanges {
+			exitIfError(errNoChange, 0)
+		} else {
 			exitIfError(errNoChange, 65)
 		}
-		// exitIfError(errNoChange, 0)
-		logger.Println("can not calculate new version, inc patch version")
-		ver := semver.MustParse(release.Version)
-		newVer = ver.IncPatch().String()
 	}
 	logger.Println("new version: " + newVer)
 
