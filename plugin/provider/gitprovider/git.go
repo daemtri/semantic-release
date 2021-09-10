@@ -2,6 +2,7 @@ package gitprovider
 
 import (
 	"fmt"
+	"net"
 	"regexp"
 	"strings"
 	"time"
@@ -17,6 +18,7 @@ import (
 	"github.com/go-git/go-git/v5/plumbing/transport"
 	"github.com/go-git/go-git/v5/plumbing/transport/http"
 	"github.com/go-git/go-git/v5/plumbing/transport/ssh"
+	cryptossh "golang.org/x/crypto/ssh"
 )
 
 func init() {
@@ -65,6 +67,10 @@ func (repo *Repository) Init(config map[string]string) error {
 		auth, err := ssh.NewPublicKeysFromFile(config["auth_username"], config["auth_private_key"], config["auth_password"])
 		if err != nil {
 			return fmt.Errorf("ssh.NewPublicKeysFromFile: %w", err)
+		}
+		// 如果不忽略会导致known_hosts问题
+		auth.HostKeyCallback = func(hostname string, remote net.Addr, key cryptossh.PublicKey) error {
+			return nil
 		}
 		repo.auth = auth
 	} else {
